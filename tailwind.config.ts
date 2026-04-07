@@ -15,7 +15,9 @@ const config: Config = {
           orange: '#FF9800',
           yellow: '#FFB300',
           dark: '#0A0A0A',
-          gray: '#1E1E1E'
+          gray: '#1E1E1E',
+          gold: '#D4AF37',
+          charcoal: '#1A1A1F',
         }
       },
       backgroundImage: {
@@ -25,7 +27,18 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-outfit)'],
-      }
+        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+      },
+      animation: {
+        'shine': 'shine 3s linear infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        shine: {
+          '0%': { backgroundPosition: '-200% center' },
+          '100%': { backgroundPosition: '200% center' },
+        },
+      },
     },
   },
   plugins: [],

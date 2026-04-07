@@ -1,17 +1,19 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight, Flame, Star } from "lucide-react";
+import { ArrowRight, Flame, Star, Pizza } from "lucide-react";
 import Image from "next/image";
-import { useRef, MouseEvent } from "react";
+import Link from "next/link";
+import { useRef, MouseEvent, useEffect } from "react";
 
 export default function Hero() {
   // Parallax Globals
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const scrollY = useMotionValue(0);
 
-  const springX = useSpring(mouseX, { stiffness: 50, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 25 });
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 25 });
 
   const handleMouseMove = (e: MouseEvent) => {
     const { clientX, clientY } = e;
@@ -20,15 +22,30 @@ export default function Hero() {
     mouseY.set(clientY - innerHeight / 2);
   };
 
+  // Scroll-based motion switching
+  const handleScroll = () => {
+    const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+    scrollY.set(scrollProgress);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Parallax Depth Layers
-  const pizzaX = useTransform(springX, [-1000, 1000], [35, -35]);
-  const pizzaY = useTransform(springY, [-1000, 1000], [35, -35]);
+  const pizzaX = useTransform(springX, [-1000, 1000], [100, -100]);
+  const pizzaY = useTransform(springY, [-1000, 1000], [100, -100]);
   
   const bgGlowX = useTransform(springX, [-1000, 1000], [-80, 80]);
   const bgGlowY = useTransform(springY, [-1000, 1000], [-80, 80]);
 
-  const textX = useTransform(springX, [-1000, 1000], [-10, 10]);
-  const textY = useTransform(springY, [-1000, 1000], [-10, 10]);
+  // Motion type based on scroll (30% vs 70%)
+  const motionType = useTransform(scrollY, [0, 0.3, 0.31], ["slow", "fast", "medium"]);
+  const animationIntensity = useTransform(scrollY, [0, 0.3, 0.31], [0.5, 1.5, 1]);
+
+  const textX = useTransform(springX, [-1000, 1000], [-40, 40]);
+  const textY = useTransform(springY, [-1000, 1000], [-40, 40]);
 
   // Magnetic CTA setup
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -83,31 +100,37 @@ export default function Hero() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
   };
 
-  const renderOrbital = (emoji: string, radiusClass: string, duration: number, startAngle: number, bgStyle: string) => (
-    <motion.div 
-      initial={{ rotate: startAngle }}
-      animate={{ rotate: startAngle + 360 }}
-      transition={{ repeat: Infinity, duration, ease: "linear" }}
-      className="absolute top-1/2 left-1/2 -mt-7 -ml-7 md:-mt-8 md:-ml-8 z-30 pointer-events-none"
-    >
-      <div className={`transform ${radiusClass}`}>
-        <motion.div 
-          initial={{ rotate: -startAngle }}
-          animate={{ rotate: -(startAngle + 360) }}
-          transition={{ repeat: Infinity, duration, ease: "linear" }}
-          className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center backdrop-blur-md border-[1.5px] ${bgStyle} shadow-lg`}
-        >
-          <span className="text-2xl md:text-3xl filter drop-shadow-md">{emoji}</span>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
+  function renderOrbital(emoji: string, radiusClass: string, duration: number, startAngle: number, bgStyle: string) {
+    return (
+      <motion.div 
+        initial={{ rotate: startAngle }}
+        animate={{ rotate: startAngle + 360 }}
+        transition={{ repeat: Infinity, duration, ease: "linear" }}
+        className="absolute top-1/2 left-1/2 -mt-7 -ml-7 md:-mt-8 md:-ml-8 z-30 pointer-events-none"
+      >
+        <div className={`transform ${radiusClass}`}>
+          <motion.div 
+            initial={{ rotate: -startAngle }}
+            animate={{ rotate: -(startAngle + 360) }}
+            transition={{ repeat: Infinity, duration, ease: "linear" }}
+            className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center backdrop-blur-md border-[1.5px] ${bgStyle} shadow-lg`}
+          >
+            <span className="text-2xl md:text-3xl filter drop-shadow-md">{emoji}</span>
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
-    <section 
-      onMouseMove={handleMouseMove}
-      className="relative w-full min-h-screen flex items-center pt-24 pb-12 overflow-hidden bg-[#FAF7F2] dark:bg-[#050505] transition-colors duration-500 perspective-1000"
-    >
+    <>
+      {/* Cinematic Hero Section */}
+      <div className="relative w-full min-h-[100vh]">
+        <div className="relative z-10">
+          <section 
+            onMouseMove={handleMouseMove}
+            className="relative w-full h-full flex items-center pt-24 pb-12 overflow-hidden bg-transparent transition-colors duration-500 perspective-1000"
+          >
       {/* Cinematic Ambient Glows & Nebulas */}
       <motion.div 
         style={{ x: bgGlowX, y: bgGlowY }}
@@ -140,9 +163,12 @@ export default function Hero() {
 
 
           {/* Heading */}
-          <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl lg:text-[5rem] font-sans font-black leading-[1.05] text-gray-900 dark:text-white tracking-tight transition-colors duration-500">
+          <motion.h1 
+            variants={fadeIn} 
+            className="text-5xl md:text-7xl lg:text-[5.5rem] font-serif font-bold leading-[1.05] text-white tracking-tight drop-shadow-2xl"
+          >
             Float Into <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-red-500 to-rose-500 drop-shadow-[0_0_30px_rgba(229,57,53,0.2)] dark:drop-shadow-[0_0_40px_rgba(229,57,53,0.3)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5D05E] to-[#D4AF37] bg-[length:200%_auto] animate-shine">
               Flavor Space
             </span><br />
             Tonight.
@@ -150,7 +176,7 @@ export default function Hero() {
 
           {/* Subheading */}
           <motion.p variants={fadeIn} className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-lg font-sans leading-relaxed text-balance transition-colors duration-500">
-            Escape gravity. Our master-crafted celestial crust and levitating ingredients forge a cinematic culinary universe you simply have to taste to believe.
+            Escape the ordinary. From handcrafted burgers and artisanal pasta to celestial desserts and executive bar selections, we forge a culinary universe you simply have to taste to believe.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -201,7 +227,7 @@ export default function Hero() {
                   <Star key={i} size={14} fill="#FFB300" className="opacity-100 drop-shadow-[0_0_4px_rgba(255,179,0,0.4)] dark:drop-shadow-[0_0_8px_rgba(255,179,0,0.8)]" />
                 ))}
               </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide transition-colors">4.9/5 from orbital citizens</span>
+              <span className="text-xs text-gray-400 font-medium tracking-wide transition-colors">4.9/5 from 12k+ dining travelers</span>
             </div>
           </motion.div>
         </motion.div>
@@ -212,44 +238,6 @@ export default function Hero() {
           {/* Depth Glow Behind Pizza */}
           <div className="absolute inset-0 z-0 bg-gradient-to-tr from-orange-500/15 via-transparent to-red-500/15 dark:from-orange-500/10 dark:to-red-500/10 blur-[100px] dark:blur-[120px] pointer-events-none transition-colors" />
 
-          {/* Parallax Central Pizza (The Core) */}
-          <motion.div 
-            style={{ x: pizzaX, y: pizzaY }}
-            initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1.5, type: "spring", bounce: 0.3 }}
-            className="absolute z-20 flex items-center justify-center cursor-pointer pointer-events-auto"
-          >
-            {/* Subtle Floating Motion */}
-            <motion.div
-              animate={{ y: [0, -15, 0] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="relative flex justify-center items-center"
-            >
-              {/* Glass Ring */}
-              <div className="absolute w-[300px] h-[300px] sm:w-[420px] sm:h-[420px] md:w-[520px] md:h-[520px] lg:w-[550px] lg:h-[550px] rounded-full border border-black/10 dark:border-white/10 backdrop-blur-md bg-white/30 dark:bg-white/5 opacity-80 dark:opacity-50 pointer-events-none transition-colors" />
-
-              {/* Pizza Container with 3D Tilt */}
-              <div
-                ref={pizzaRef}
-                onMouseMove={handlePizzaMove}
-                onMouseLeave={handlePizzaLeave}
-                className="relative transition-transform duration-200 ease-out will-change-transform w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[530px] lg:h-[530px]"
-              >
-                <div className="absolute inset-2 md:inset-4 rounded-full bg-gradient-to-br from-[#ffd8be] to-[#fff] dark:from-[#2a1608] dark:to-[#120a04] shadow-[0_0_80px_rgba(255,100,0,0.15)] dark:shadow-[0_0_80px_rgba(255,100,0,0.25)] border-[4px] border-white/50 dark:border-[#3a1d0d]/40 -z-10 transition-colors" />
-                
-                <Image
-                  src="/pizza.png"
-                  alt="Delicious Hot Pepperoni Pizza"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 280px, (max-width: 1024px) 500px, 530px"
-                  className="rounded-full object-cover shadow-[0_40px_80px_rgba(0,0,0,0.3)] dark:shadow-[0_40px_80px_rgba(0,0,0,0.6)] drop-shadow-[0_0_20px_rgba(255,100,0,0.15)] dark:drop-shadow-[0_0_30px_rgba(255,100,0,0.3)] hover:scale-[1.02] transition-transform duration-500"
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-
           {/* Orbital System (Gravity Rings) */}
           <div className="absolute w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] md:w-[550px] md:h-[550px] rounded-full border border-black/5 dark:border-white/5 border-dashed transition-colors" />
           <div className="absolute w-[380px] h-[380px] sm:w-[550px] sm:h-[550px] md:w-[700px] md:h-[700px] rounded-full border border-brand-orange/20 dark:border-brand-orange/10 opacity-30 dark:opacity-30" />
@@ -257,19 +245,145 @@ export default function Hero() {
 
           {/* Planets / Particles */}
           {/* Inner orbit */}
-          {renderOrbital("🌿", "translate-x-[150px] sm:translate-x-[225px] md:translate-x-[275px]", 18, 0, "bg-[#e8f5e9]/90 dark:bg-[#0A1A0A]/80 border-green-500/30 dark:border-green-500/20")}
-          {renderOrbital("🍅", "translate-x-[150px] sm:translate-x-[225px] md:translate-x-[275px]", 18, 180, "bg-[#ffebee]/90 dark:bg-[#2a0e0e]/80 border-red-500/30 dark:border-red-500/20")}
+          {renderOrbital("🍔", "translate-x-[150px] sm:translate-x-[225px] md:translate-x-[275px]", 18, 0, "bg-white/10 border-[#D4AF37]/30")}
+          {renderOrbital("🍝", "translate-x-[150px] sm:translate-x-[225px] md:translate-x-[275px]", 18, 180, "bg-white/10 border-[#D4AF37]/20")}
 
           {/* Middle orbit */}
-          {renderOrbital("🍄", "translate-x-[190px] sm:translate-x-[275px] md:translate-x-[350px]", 25, 90, "bg-[#fff3e0]/90 dark:bg-[#1f1a15]/80 border-orange-400/50 dark:border-orange-900/40")}
+          {renderOrbital("☕", "translate-x-[190px] sm:translate-x-[275px] md:translate-x-[350px]", 25, 90, "bg-white/10 border-white/20")}
           {/* Extra magic dust */}
-          {renderOrbital("✨", "translate-x-[190px] sm:translate-x-[275px] md:translate-x-[350px]", 25, 270, "bg-[#fffde7]/90 dark:bg-[#1a1a0f]/80 border-yellow-500/30 dark:border-yellow-500/20 opacity-90 dark:opacity-80 scale-75")}
+          {renderOrbital("🍰", "translate-x-[190px] sm:translate-x-[275px] md:translate-x-[350px]", 25, 270, "bg-white/10 border-white/20 opacity-90 scale-75")}
 
           {/* Outer orbit */}
-          {renderOrbital("🌶️", "translate-x-[230px] sm:translate-x-[325px] md:translate-x-[425px]", 35, 220, "bg-[#ffebee]/90 dark:bg-[#2a0e0e]/80 border-red-400/50 dark:border-red-900/50 scale-110")}
+          {renderOrbital("🍸", "translate-x-[230px] sm:translate-x-[325px] md:translate-x-[425px]", 35, 220, "bg-white/10 border-[#D4AF37]/50 scale-110")}
           
         </div>
       </div>
-    </section>
+      </section>
+        </div>
+      </div>
+      {/* Additional scrollable content for animation - Section 1: Features */}
+      <div className="relative z-20 min-h-[100vh] bg-transparent backdrop-blur-[2px] border-t border-white/5">
+        <div className="container mx-auto px-6 py-32">
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="max-w-4xl mx-auto text-center mb-24"
+          >
+            <h2 className="text-5xl md:text-7xl font-serif font-bold text-white mb-8 tracking-tight">The Galactic Experience</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto rounded-full mb-8" />
+            <p className="text-xl md:text-2xl text-white/60 leading-relaxed max-w-3xl mx-auto font-light">
+              We've transcended traditional boundaries to bring you a hand-curated menu harvested from the farthest reaches of the culinary nebula. From dry-aged wagyu to artisanal milk shakes, each category represents a singular planet in our gastronomic universe. Journey through our seven core pillars—each engineered with astronomical precision to redefine your understanding of flavor, texture, and celestial dining.
+            </p>
+          </motion.div>
+
+          <div className="flex flex-col gap-64 pb-32">
+            {[
+              { icon: "🍔", title: "Astronomy Burgers", desc: "Hand-pressed wagyu patties infused with astronomical flavor and zero-gravity lightness.", highlight: "Wagyu Patties" },
+              { icon: "🍝", title: "Artisan Pasta", desc: "House-made strands tossed in sauces harvested from the farthest reaches of taste.", highlight: "House-made Strands" },
+              { icon: "🍸", title: "Celestial Bar", desc: "Mixology that transcends traditional boundaries with cosmic spirits and stardust rimming.", highlight: "Mixology" },
+              { icon: "☕", title: "Nebula Brews", desc: "Artisanal coffee beans roasted under the pressure of deep-space flavor extraction.", highlight: "Artisanal Coffee" },
+              { icon: "🍰", title: "Starlight Cakes", desc: "Multi-layered galactic confections with textures light as a nebula cloud.", highlight: "Decadent Confections" },
+              { icon: "🍨", title: "Comet Ice Creams", desc: "Sub-zero chilled masterpieces featuring crystalline textures and infinite cosmic sweetness.", highlight: "Sub-Zero Masterpieces" },
+              { icon: "🥤", title: "Stardust Shakes", desc: "Velvety, nebula-infused milk shakes blended with stardust-rimmed artisan ingredients.", highlight: "Artisan Milk Shakes" }
+            ].map((feature, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -100 : 100 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.3 }}
+                transition={{ duration: 1, type: "spring", stiffness: 50 }}
+                className="relative w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12 bg-white/[0.02] backdrop-blur-3xl rounded-[3rem] p-12 md:p-20 border border-white/5 hover:border-[#D4AF37]/30 transition-all group overflow-hidden"
+              >
+                {/* Background numbers for linear feel */}
+                <span className="absolute -top-10 -left-10 text-[15rem] font-black text-white/[0.02] pointer-events-none select-none">0{i + 1}</span>
+                
+                <div className="relative z-10 text-8xl md:text-9xl mb-8 md:mb-0 group-hover:scale-110 transition-transform duration-700">
+                  {feature.icon}
+                  <div className="absolute inset-0 bg-[#D4AF37]/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                
+                <div className="relative z-10 flex-1 space-y-6">
+                  <span className="text-[#D4AF37] font-bold tracking-[0.3em] uppercase text-xs opacity-70 mb-2 block">{feature.highlight}</span>
+                  <h3 className="text-4xl md:text-7xl font-serif font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-500 leading-tight">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xl md:text-2xl text-white/40 leading-relaxed font-light font-sans max-w-xl">
+                    {feature.desc}
+                  </p>
+                  
+                  <div className="pt-8">
+                    <motion.button 
+                      whileHover={{ x: 10 }}
+                      className="flex items-center gap-4 text-[#D4AF37] font-bold text-lg group/btn"
+                    >
+                      Explore Menu 
+                      <div className="w-12 h-px bg-[#D4AF37] group-hover/btn:w-24 transition-all" />
+                    </motion.button>
+                  </div>
+                </div>
+
+                {/* Animated Ambient Line */}
+                <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Section 2: Culinary Showcase */}
+      <div className="relative z-20 min-h-[120vh] bg-transparent border-t border-white/5 flex items-center">
+        <div className="container mx-auto px-6 py-48 flex flex-col items-center">
+           <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: false, amount: 0.4 }}
+            className="relative w-full max-w-6xl rounded-[4rem] overflow-hidden aspect-[21/9] group shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/5"
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0D] via-[#0B0B0D]/20 to-transparent z-10" />
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?q=80&w=2000')] bg-cover bg-center opacity-40 group-hover:scale-110 transition-transform duration-[30s]" />
+            <div className="absolute bottom-16 left-16 z-20 max-w-2xl px-4 md:px-0">
+              <span className="text-[#D4AF37] font-bold tracking-[0.4em] text-xs uppercase mb-6 block">Mastering the Elements</span>
+              <h2 className="text-4xl md:text-8xl font-serif font-bold text-white mb-8 leading-[0.9]">The Cinematic <br />Experience.</h2>
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-1 bg-[#D4AF37] rounded-full" />
+                <p className="text-lg text-white/50 leading-relaxed max-w-md font-light">
+                  Our atmosphere is meticulously crafted to complement the depth of our celestial menu.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Section 3: Call to Action / Footer Journey */}
+      <div className="relative z-20 min-h-[100vh] bg-transparent flex items-center justify-center border-t border-white/5">
+        <div className="text-center">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            className="space-y-12"
+          >
+            <h2 className="text-6xl md:text-9xl font-serif font-bold text-white tracking-tighter">Ready for <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-[#F5D05E]">Liftoff?</span></h2>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+              <Link href="/table-booking">
+                <button className="px-12 py-6 bg-[#D4AF37] text-black text-xl font-bold rounded-full hover:scale-105 transition-all shadow-[0_0_50px_rgba(212,175,55,0.3)]">Reserve Your Orbit</button>
+              </Link>
+              <button className="px-12 py-6 bg-white/5 text-white text-xl font-bold rounded-full border border-white/10 hover:bg-white/10 transition-all">Explore Menu</button>
+            </div>
+            
+            <div className="pt-32 flex flex-col items-center gap-4 opacity-40">
+              <div className="flex items-center gap-2 text-white">
+                <Pizza size={24} />
+                <span className="font-serif italic">SliceCity Galactic Headquarters - Sector 7</span>
+              </div>
+              <p className="text-sm">© 2026 Crafted with Stardust by Antigravity</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </>
   );
 }

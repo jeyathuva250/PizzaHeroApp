@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Outfit, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({ 
   subsets: ["latin"],
   variable: '--font-outfit'
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${outfit.variable} font-sans antialiased bg-[#F7F4F0] dark:bg-brand-dark text-gray-900 dark:text-white overflow-x-hidden transition-colors duration-500`}>
+      <body className={`${outfit.variable} ${playfair.variable} font-sans antialiased bg-[#0B0B0D] dark:bg-brand-dark text-white overflow-x-hidden transition-colors duration-500`}>
         {children}
       </body>
     </html>
