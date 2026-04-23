@@ -5,6 +5,8 @@ import { ArrowRight, Flame, Star, Pizza } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, MouseEvent, useEffect } from "react";
+import ScrollVideo from "./ScrollVideo";
+import BookingShowcase from "./BookingShowcase";
 
 export default function Hero() {
   // Parallax Globals
@@ -121,16 +123,17 @@ export default function Hero() {
       </motion.div>
     );
   }
-
+  
   return (
     <>
-      {/* Cinematic Hero Section */}
-      <div className="relative w-full min-h-[100vh]">
+      {/* Cinematic Hero Section - Full Screen with ScrollVideo */}
+      <div className="relative w-full min-h-screen">
         <div className="relative z-10">
           <section 
             onMouseMove={handleMouseMove}
             className="relative w-full h-full flex items-center pt-24 pb-12 overflow-hidden bg-transparent transition-colors duration-500 perspective-1000"
           >
+            <ScrollVideo folderName="ezgif-5bdcf37896a48102-jpg" frameCount={192} />
       {/* Cinematic Ambient Glows & Nebulas */}
       <motion.div 
         style={{ x: bgGlowX, y: bgGlowY }}
@@ -167,7 +170,7 @@ export default function Hero() {
             variants={fadeIn} 
             className="text-5xl md:text-7xl lg:text-[5.5rem] font-serif font-bold leading-[1.05] text-white tracking-tight drop-shadow-2xl"
           >
-            Float Into <br />
+            The Art of Dining <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F5D05E] to-[#D4AF37] bg-[length:200%_auto] animate-shine">
               Flavor Space
             </span><br />
@@ -261,24 +264,17 @@ export default function Hero() {
       </section>
         </div>
       </div>
-      {/* Additional scrollable content for animation - Section 1: Features */}
+      
+      {/* Section 1: Table Booking (New 2nd Section) */}
+      <BookingShowcase />
+
+      {/* Additional scrollable content - Section 2: Features */}
       <div className="relative z-20 min-h-[100vh] bg-transparent backdrop-blur-[2px] border-t border-white/5">
         <div className="container mx-auto px-6 py-32">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-            className="max-w-4xl mx-auto text-center mb-24"
           >
-            <h2 className="text-5xl md:text-7xl font-serif font-bold text-white mb-8 tracking-tight">The Galactic Experience</h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mx-auto rounded-full mb-8" />
-            <p className="text-xl md:text-2xl text-white/60 leading-relaxed max-w-3xl mx-auto font-light">
-              We've transcended traditional boundaries to bring you a hand-curated menu harvested from the farthest reaches of the culinary nebula. From dry-aged wagyu to artisanal milk shakes, each category represents a singular planet in our gastronomic universe. Journey through our seven core pillars—each engineered with astronomical precision to redefine your understanding of flavor, texture, and celestial dining.
-            </p>
-          </motion.div>
-
-          <div className="flex flex-col gap-64 pb-32">
             {[
               { icon: "🍔", title: "Astronomy Burgers", desc: "Hand-pressed wagyu patties infused with astronomical flavor and zero-gravity lightness.", highlight: "Wagyu Patties" },
               { icon: "🍝", title: "Artisan Pasta", desc: "House-made strands tossed in sauces harvested from the farthest reaches of taste.", highlight: "House-made Strands" },
@@ -328,7 +324,7 @@ export default function Hero() {
                 <div className="absolute right-0 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-[#D4AF37]/20 to-transparent" />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
 

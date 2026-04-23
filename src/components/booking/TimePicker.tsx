@@ -62,13 +62,13 @@ export default function TimePicker({ selectedTime, setSelectedTime }: TimePicker
                 background: !available
                   ? "rgba(255,255,255,0.02)"
                   : isSelected
-                  ? "linear-gradient(135deg, rgba(212,175,55,0.3), rgba(168,133,42,0.12))"
-                  : "rgba(255,255,255,0.03)",
+                    ? "linear-gradient(135deg, rgba(212,175,55,0.3), rgba(168,133,42,0.12))"
+                    : "rgba(255,255,255,0.03)",
                 border: !available
                   ? "1px solid rgba(255,255,255,0.04)"
                   : isSelected
-                  ? "1px solid rgba(212,175,55,0.6)"
-                  : "1px solid rgba(212,175,55,0.08)",
+                    ? "1px solid rgba(212,175,55,0.6)"
+                    : "1px solid rgba(212,175,55,0.08)",
                 opacity: !available ? 0.35 : 1,
                 boxShadow: isSelected ? "0 0 12px rgba(212,175,55,0.2)" : "none",
                 cursor: !available ? "not-allowed" : "pointer",
@@ -95,7 +95,7 @@ export default function TimePicker({ selectedTime, setSelectedTime }: TimePicker
               <span
                 className="text-xs font-bold leading-none"
                 style={{
-                  color: isSelected ? "#D4AF37" : !available ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)",
+                  color: isSelected ? "#D4AF37" : !available ? "rgba(255,255,255,0.2)" : "rgba(255, 255, 255, 0.36)",
                 }}
               >
                 {label}
@@ -103,7 +103,7 @@ export default function TimePicker({ selectedTime, setSelectedTime }: TimePicker
               <span
                 className="text-[9px] leading-none"
                 style={{
-                  color: isSelected ? "rgba(212,175,55,0.6)" : "rgba(255,255,255,0.15)",
+                  color: isSelected ? "rgba(212,175,55,0.6)" : "rgba(255, 255, 255, 0.65)",
                 }}
               >
                 {time}
